@@ -1,19 +1,20 @@
 package com.ag.tgbot.service;
 
 import com.ag.tgbot.dto.ValuteCursOnDate;
-import com.ag.tgbot.repository.ActiveChatRepository;
 import com.ag.tgbot.entity.ActiveChat;
+import com.ag.tgbot.repository.ActiveChatRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
+
 import javax.xml.datatype.DatatypeConfigurationException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class ScheduleService {
@@ -40,7 +41,7 @@ public class ScheduleService {
                 previousRates.addAll(currentRates);
             }
         } catch (DatatypeConfigurationException e) {
-            e.printStackTrace();
+            log.error("Возникла проблема при получении данных от сервисов ЦБ РФ", e);
         }
     }
 }

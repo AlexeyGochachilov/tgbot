@@ -10,9 +10,9 @@ import javax.persistence.*;
 public class ActiveChat {
 
     @Id
-    @GeneratedValue
-    private Long id; //Уникальный идентификатор в системе нашего бота
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(name = "CHAT_ID")
-    private Long chatId; //Уникальный идентификатор в системе Telegram
+    private Long chatId;
 }

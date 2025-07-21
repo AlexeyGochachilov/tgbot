@@ -64,12 +64,11 @@ public class BotService extends TelegramLongPollingBot {
                 activeChat.setChatId(chatId);
                 activeChatRepository.save(activeChat);
             }
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Возникла неизвестная проблема, сообщите пожалуйста администратору", e);
         }
     }
+
 
     public void sendNotificationToAllActiveChats(String message, Set<Long> chatIds) {
         for (Long id : chatIds) {
@@ -79,9 +78,24 @@ public class BotService extends TelegramLongPollingBot {
             try {
                 execute(sendMessage);
             } catch (TelegramApiException e) {
-                e.printStackTrace();
+                log.error("Не удалось отправить сообщение", e);
             }
         }
+    }
+
+    @PostConstruct
+    public void start() {
+        log.info("username: {}, token: {}", name, apiKey);
+    }
+
+    @Override
+    public String getBotUsername() {
+        return name;
+    }
+
+    @Override
+    public String getBotToken() {
+        return apiKey;
     }
 
     private void putPreviousCommand(Long chatId, String command) {
@@ -97,22 +111,5 @@ public class BotService extends TelegramLongPollingBot {
     private String getPreviousCommand(Long chatId) {
         return previousCommands.get(chatId)
                 .get(previousCommands.get(chatId).size() - 1);
-    }
-
-    //Данный метод будет вызван сразу после того, как данный бин будет создан - это обеспечено аннотацией Spring PostConstruct
-    @PostConstruct
-    public void start() {
-        log.info("username: {}, token: {}", name, apiKey);
-    }
-
-    //Данный метод просто возвращает данные о имени бота и его необходимо переопределять
-    @Override
-    public String getBotUsername() {
-        return name;
-    }
-    //Данный метод возвращает API ключ для взаимодействия с Telegram
-    @Override
-    public String getBotToken() {
-        return apiKey;
     }
 }

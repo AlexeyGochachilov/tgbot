@@ -18,11 +18,10 @@ import java.util.List;
 //Данный класс наследуется от WebServiceTemplate, который предоставляет удобный способ взаимодействия с SOAP веб сервисами
 public class CentralRussianBankService extends WebServiceTemplate {
 
-    //Тут случается некоторая магия Spring и в момент запуска вашего приложения, сюда поставляется значение из application.properties или application.yml
     @Value("${cbr.api.url}")
     private String cbrApiUrl;
 
-    //Создаем метод получения данных
+
     public List<ValuteCursOnDate> getCurrenciesFromCbr() throws DatatypeConfigurationException {
         final GetCursOnDateXml getCursOnDateXML = new GetCursOnDateXml();
         GregorianCalendar cal = new GregorianCalendar();
@@ -31,14 +30,19 @@ public class CentralRussianBankService extends WebServiceTemplate {
         XMLGregorianCalendar xmlGregCal = DatatypeFactory.newInstance().newXMLGregorianCalendar(cal);
         getCursOnDateXML.setOnDate(xmlGregCal);
 
+        System.out.println(getCursOnDateXML);
         GetCursOnDateXmlResponse response = (GetCursOnDateXmlResponse) marshalSendAndReceive(cbrApiUrl, getCursOnDateXML);
 
         if (response == null) {
-            throw new IllegalStateException("Could not get response from CBR Service");
+            throw new IllegalStateException("Не удалось получить данные от ЦБ РФ");
         }
 
         final List<ValuteCursOnDate> courses = response.getGetCursOnDateXmlResult().getValuteData();
         courses.forEach(course -> course.setName(course.getName().trim()));
         return courses;
+    }
+
+    public ValuteCursOnDate getCourseForCurrency(String code) throws DatatypeConfigurationException {
+        return getCurrenciesFromCbr().stream().filter(currency -> code.equals(currency.getChCode())).findFirst().get();
     }
 }
